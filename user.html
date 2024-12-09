@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="user.css">
+    <link rel="icon" href="LOGO1.png" type="image/png">
+    <title>Admin - User Management</title>
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .modal-content button {
+            margin-top: 10px;
+            padding: 10px;
+        }
+
+        .modal-content button:hover {
+            background-color: #ddd;
+        }
+
+        /* Delete Icon */
+        .delete-icon {
+            cursor: pointer;
+            color: red;
+            font-size: 20px;
+        }
+
+        .delete-icon:hover {
+            color: darkred;
+        }
+
+        /* Success Message Styles */
+        .success-message {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="admin">
+        <nav>
+            <img class="icon" src="LOGO1.png" alt="Logo">
+            <label class="logo">Corn Registry System</label>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="admin.html">Back to Admin Dashboard</a></li>
+            </ul>
+        </nav>
+
+        <div class="admin-box">
+            <h1>User Management</h1>
+            <input type="text" id="searchInput" placeholder="Search users..." onkeyup="searchUsers()" />
+
+            <table id="userTable">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAll" onclick="selectAllUsers()" /></th>
+                        <th><button onclick="sortTable('name')">Name</button></th>
+                        <th><button onclick="sortTable('rsbaNumber')">RSBA Number</button></th>
+                        <th><button onclick="sortTable('farmLocation')">Farm Location</button></th>
+                        <th><button onclick="sortTable('farmSize')">Farm Size</button></th>
+                        <th><button onclick="sortTable('barangay')">Barangay</button></th>
+                        <th><button onclick="sortTable('contactNumber')">Contact Number</button></th>
+                        <th><button onclick="sortTable('status')">Status</button></th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be dynamically inserted here -->
+                </tbody>
+            </table>
+
+            <button onclick="approveSelected()">Approve</button>
+            <button onclick="denySelected()">Deny</button>
+        </div>
+    </section>
+
+    <!-- Modal for Denial Confirmation -->
+    <div id="denyModal" class="modal">
+        <div class="modal-content">
+            <h2>Are you sure you want to deny this user?</h2>
+            <button id="confirmDenyBtn" onclick="denyConfirmed()">Deny</button>
+            <button onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let userIdToDeny = null; // Store the ID of the user to deny
+
+        // Function to render the user table
+function renderTable(usersToRender = users) {
+    const tableBody = document.querySelector('#userTable tbody');
+    tableBody.innerHTML = ''; // Clear existing table content
+
+    usersToRender.forEach(user => {
+        const farmLocation = user.farmLocation || ''; // Handle missing farmLocation
+        const contactNumber = user.contactNumber || ''; // Handle missing contactNumber
+        const barangay = user.barangay || ''; // Handle missing barangay
+        const farmSize = user.farmSize ? `${user.farmSize} hectares` : ''; // Handle missing farmSize
+        const status = user.status || 'Pending'; // Default to 'Pending' if no status
+
+        const firstName = user.firstName || 'N/A';
+        const lastName = user.lastName || 'N/A';
+        const homeAddress = user.homeAddress || 'N/A'; // Handle missing homeAddress
+
+        const row = document.createElement('tr'); // Create a new table row
+
+        row.innerHTML = `
+            <td><input type="checkbox" class="userCheckbox" data-id="${user.id}" /></td>
+            <td>${firstName} ${lastName}</td>
+            <td>${user.rsbaNumber}</td>
+            <td>${farmLocation}</td>
+            <td>${farmSize}</td>
+            <td>${barangay} <br> ${homeAddress}</td>
+            <td>${contactNumber}</td>
+            <td>${status}</td>
+            <td>
+                <button onclick="approveUser(${user.id})">Approve</button>
+                <button onclick="confirmDenyUser(${user.id})">Deny</button>
+            </td>
+        `;
+
+        tableBody.appendChild(row);
+    });
+}
+
+        // Approve a user
+        function approveUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                user.status = 'Approved';
+                localStorage.setItem('users', JSON.stringify(users));
+                renderTable();  // Re-render the table after the update
+                showSuccessMessage('User approved successfully');
+            }
+        }
+
+        // Deny selected users
+        function denySelected() {
+            const selectedIds = getSelectedUserIds();
+            if (selectedIds.length === 0) {
+                alert('Please select at least one user to deny.');
+                return;
+            }
+            selectedIds.forEach(id => {
+                users = users.filter(user => user.id !== id);
+            });
+            localStorage.setItem('users', JSON.stringify(users));
+            renderTable();
+            showSuccessMessage('Selected users denied');
+        }
+
+        // Approve selected users
+        function approveSelected() {
+            const selectedIds = getSelectedUserIds();
+            if (selectedIds.length === 0) {
+                alert('Please select at least one user to approve.');
+                return;
+            }
+            selectedIds.forEach(id => {
+                const user = users.find(u => u.id === id);
+                if (user) {
+                    user.status = 'Approved';
+                }
+            });
+            localStorage.setItem('users', JSON.stringify(users));
+            renderTable();
+            showSuccessMessage('Selected users approved');
+        }
+
+        // Get selected user IDs
+        function getSelectedUserIds() {
+            const selectedCheckboxes = document.querySelectorAll('.userCheckbox:checked');
+            return Array.from(selectedCheckboxes).map(checkbox => parseInt(checkbox.dataset.id));
+        }
+
+        // Select or deselect all checkboxes
+        function selectAllUsers() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const userCheckboxes = document.querySelectorAll('.userCheckbox');
+            userCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+
+        // Confirm denial of a user
+        function confirmDenyUser(userId) {
+            userIdToDeny = userId;
+            showModal();
+        }
+
+        // Confirm denial action
+        function denyConfirmed() {
+            const user = users.find(u => u.id === userIdToDeny);
+            if (user) {
+                users = users.filter(u => u.id !== user.id);
+                localStorage.setItem('users', JSON.stringify(users));
+                renderTable();
+                showSuccessMessage('User denied');
+            }
+            closeModal();
+        }
+
+        // Close the denial modal
+        function closeModal() {
+            document.getElementById('denyModal').classList.remove('show');
+        }
+
+        // Show the denial modal
+        function showModal() {
+            document.getElementById('denyModal').classList.add('show');
+        }
+
+        // Search users
+        function searchUsers() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filteredUsers = users.filter(user => {
+                return (
+                    user.firstName.toLowerCase().includes(query) ||
+                    user.middleInitial.toLowerCase().includes(query) ||
+                    user.lastName.toLowerCase().includes(query) ||
+                    user.rsbaNumber.toLowerCase().includes(query) ||
+                    user.farmLocation.toLowerCase().includes(query) ||
+                    user.contactNumber.toLowerCase().includes(query)
+                );
+            });
+            renderTable(filteredUsers);
+        }
+
+        // Sort the table by a specific column
+        function sortTable(column) {
+            users.sort((a, b) => {
+                if (column === 'name') {
+                    return a.firstName.localeCompare(b.firstName);
+                } else if (column === 'rsbaNumber' || column === 'contactNumber') {
+                    return a[column] - b[column];  // Numeric comparison
+                } else if (column === 'farmLocation') {
+                    return a.farmLocation.localeCompare(b.farmLocation);
+                } else if (column === 'farmSize') {
+                    return parseFloat(a.farmSize) - parseFloat(b.farmSize);  // Correct sorting for numbers
+                } else if (column === 'status') {
+                    return a.status.localeCompare(b.status);
+                } else if (column === 'barangay') {
+                    return a.barangay.localeCompare(b.barangay);
+                }
+                return 0;
+            });
+            renderTable();
+        }
+
+        // Show success message
+        function showSuccessMessage(message) {
+            const messageBox = document.createElement('div');
+            messageBox.classList.add('success-message');
+            messageBox.textContent = message;
+            document.body.appendChild(messageBox);
+            setTimeout(() => {
+                messageBox.remove();
+            }, 3000); // Remove after 3 seconds
+        }
+
+        // Initial render of the table
+        renderTable();
+    </script>
+</body>
+
+</html>

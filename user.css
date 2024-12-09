@@ -1,0 +1,247 @@
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+   background: linear-gradient(to bottom, #175a08 15%, #4ed42d 90%, #0e8818 100%  ); 
+    color: #333;
+    font-size: 16px;
+}
+
+a {
+    text-decoration: none;
+    color: #333;
+}
+
+h1, h2 {    
+    font-weight: normal;
+}
+
+footer {
+    text-align: center;
+}
+
+/* Navigation Bar */
+nav {   
+    background-color: #2f3b52ec;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+nav img.icon {
+    color:#ffffff;  
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+nav .logo {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+nav ul {
+    list-style-type: none;
+    display: flex;
+    gap: 20px;
+}
+
+nav ul li {
+    display: inline;
+}
+
+nav ul li a {
+    color: white;
+    font-size: 16px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+nav ul li a:hover {
+    background-color: #1d2a3a;
+}
+
+/* Admin Box */
+.admin-box {
+    background-color: rgb(255, 255, 255);
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 1200px;
+}
+
+.admin-box h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.admin-box input {
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 400px;
+    font-size: 16px;    
+}
+
+.admin-box input:focus {
+    border-color: #2f3b52;
+    outline: none;
+}
+
+button {
+    background-color: #2f3b52da;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #1d2a3a;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th,
+table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #2f3b52;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+table td {
+    background-color:       rgba(255, 255, 255, 0.801);
+}
+
+table td button {
+    background-color: #4caf50;
+    border-radius: 4px;
+    padding: 6px 12px;
+    margin-right: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+table td button:hover {
+    background-color: #45a049;
+}
+
+table td button:nth-child(2) {
+    background-color: #f44336;
+}
+
+table td button:nth-child(2):hover {
+    background-color: #e53935;
+}
+
+input[type="checkbox"] {
+    transform: scale(1.2);
+    margin-right: 10px;
+}
+
+/* Sky Green for Pending Users */
+.pending {
+    background-color: #98FF98; 
+    color: #008B8B; /* Sky Blue for text */
+}
+
+/* Approved User Row Style */
+.approved {
+    background-color: #DFFFD6; /* Light green for approved users */
+}
+
+/* Denied User Row Style */
+.denied {
+    background-color: #F44336; /* Red for denied users */
+    color: white; /* White text on red background */
+}
+
+/* Footer */
+.footer3 {
+    background-color: #2f3b52;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.footer3 .icon2 {
+    width: 40px;
+    height: 40px;
+}
+
+.footer3 .h2-footer {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+.footer3 .p-region {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.footer3 .bigx {
+    font-size: 28px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.footer3 .p-gusty {
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .admin-box {
+        width: 100%;
+        padding: 15px;
+    }
+
+    table th,
+    table td {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    button {
+        padding: 8px 15px;
+    }
+}
+
+/* Sky Green for Pending Users */
+.pending {
+    background-color: #98FF98; /* Light green */
+    color: #008B8B; /* Sky Blue for text */
+}
+
